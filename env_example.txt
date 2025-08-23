@@ -1,0 +1,23 @@
+# Environment Variables for Video Membership App
+# Copy this file to .env and fill in your actual values
+
+# MongoDB Atlas Configuration
+# Get these from your MongoDB Atlas dashboard at https://cloud.mongodb.com/
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/video_membership?retryWrites=true&w=majority
+MONGODB_DATABASE=video_membership
+
+# JWT Configuration
+# Generate a secure random key for production
+SECRET_KEY=your-secret-key-here-make-it-long-and-random-at-least-32-characters
+
+# Algolia Configuration (Search Engine)
+# Get these from your Algolia dashboard at https://www.algolia.com/
+ALGOLIA_APP_ID=your_algolia_app_id
+ALGOLIA_API_KEY=your_algolia_api_key
+ALGOLIA_INDEX_NAME=your_index_name
+
+# Optional: JWT Algorithm (defaults to HS256)
+JWT_ALGORITHM=HS256
+
+# Optional: Session Duration in seconds (defaults to 86400 = 24 hours)
+SESSION_DURATION=86400
