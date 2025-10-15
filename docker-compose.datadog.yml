@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: dd-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+      - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_CONTAINER_EXCLUDE_LOGS="name:dd-agent"
+    volumes:
+      - /var/run/datadog:/var/run/datadog
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    ports:
+      - "8126:8126"  # APM
+      - "8125:8125/udp"  # DogStatsD
+    restart: unless-stopped
+    networks:
+      - datadog-network
+
+  # Your FastAPI application
+  video-membership-api:
+    build: .
+    container_name: video-membership-api
+    environment:
+      - DD_TRACE_ENABLED=true
+      - DD_SERVICE=video-membership-api
+      - DD_ENV=development
+      - DD_VERSION=1.0.0
+      - DD_AGENT_HOST=datadog-agent
+      - DD_TRACE_AGENT_PORT=8126
+      - DD_DOGSTATSD_HOST=datadog-agent
+      - DD_DOGSTATSD_PORT=8125
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_INJECTION=true
+      # Your existing environment variables
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGOLIA_APP_ID=${ALGOLIA_APP_ID}
+      - ALGOLIA_API_KEY=${ALGOLIA_API_KEY}
+      - ALGOLIA_INDEX_NAME=${ALGOLIA_INDEX_NAME}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - SESSION_DURATION=${SESSION_DURATION}
+    depends_on:
+      - datadog-agent
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: ddtrace-run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - datadog-network
+
+networks:
+  datadog-network:
+    driver: bridge

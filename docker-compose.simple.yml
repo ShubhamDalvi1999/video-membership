@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  video-membership-api:
+    build: .
+    container_name: video-membership-api
+    environment:
+      # Your existing environment variables
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB_NAME=${MONGODB_DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGOLIA_APP_ID=${ALGOLIA_APP_ID}
+      - ALGOLIA_API_KEY=${ALGOLIA_API_KEY}
+      - ALGOLIA_INDEX_NAME=${ALGOLIA_INDEX_NAME}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - SESSION_DURATION=${SESSION_DURATION}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

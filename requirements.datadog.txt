@@ -1,0 +1,18 @@
+# Existing requirements
+fastapi
+uvicorn
+motor
+pymongo
+python-dotenv
+email-validator
+argon2-cffi
+pytest
+jinja2
+python-multipart
+python-jose[cryptography]
+algoliasearch>=3.0.0
+pydantic-settings
+
+# Datadog monitoring dependencies
+ddtrace>=1.0.0
+datadog>=0.47.0
